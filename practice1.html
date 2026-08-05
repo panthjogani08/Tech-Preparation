@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>practice Website</title>
+
+    <style>
+       
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7fb;
+            color: #222;
+        }
+
+        .navbar {
+            background-color: #1e293b;
+
+            
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 20px 8%;
+        }
+
+        .logo {
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            
+            display: flex;
+            gap: 30px;
+
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .nav-links a:hover {
+            color: #38bdf8;
+        }
+
+        .hero {
+            min-height: 75vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+            padding: 40px 20px;
+
+            background: linear-gradient(
+                135deg,
+                #0f172a,
+                #2563eb
+            );
+
+            color: white;
+        }
+
+        .hero-content {
+            max-width: 750px;
+        }
+
+        .hero h1 {
+            font-size: 55px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .button {
+            display: inline-block;
+
+            padding: 14px 30px;
+
+            background-color: #38bdf8;
+            color: #0f172a;
+
+            text-decoration: none;
+            font-weight: bold;
+
+            border-radius: 8px;
+
+            transition: 0.3s;
+        }
+
+        .button:hover {
+            background-color: rgb(242, 244, 246);
+        }
+
+        .features {
+            padding: 70px ;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 35px;
+            margin-bottom: 40px;
+        }
+
+        .cards {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            justify-content: center;
+
+            gap: 25px;
+        }
+
+        .card {
+
+            flex: 1 1 250px;
+
+            max-width: 300px;
+
+            background-color: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        .card h3 {
+            color: #2563eb;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .card p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        footer {
+            background-color: #1e293b;
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 25px;
+        }
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .hero p {
+                font-size: 17px;
+            }
+
+            .cards {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">
+            SIH practice
+        </div>
+
+        <ul class="nav-links">
+
+            <li>
+                <a href=" ">Home</a>
+            </li>
+
+            <li>
+                <a href="about">About</a>
+            </li>
+
+            <li>
+                <a href="features">Features</a>
+            </li>
+
+            <li>
+                <a href="contact">Contact</a>
+            </li>
+
+        </ul>
+
+    </header>
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+                Welcome to the website.
+            </h1>
+
+            <p>
+                We are glad to share you our journey from our first project which is tetrathone to this SIH.
+            </p>
+
+            <a href="features" class="button">
+                Get Started
+            </a>
+
+        </div>
+
+    </section>
+
+    <section class="features" id="features">
+
+        <h2>
+            Our Features
+        </h2>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <h3>
+                     Fast
+                </h3>
+
+                <p>
+                    Our website is designed to be
+                    lightweight and fast.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Responsive
+                </h3>
+
+                <p>
+                    The layout automatically adjusts
+                    for phones, tablets and computers.
+                </p>
+
+            </div>
+
+            <div class="card">
+
+                <h3>
+                     Modern
+                </h3>
+
+                <p>
+                    A clean and attractive design
+                    for a modern website.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                     Flexbox
+                </h3>
+
+                <p>
+                    CSS Flexbox is used to create
+                    flexible and responsive layouts.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <footer id="contact">
+
+        <p>
+             2026 MyWebsite | All Rights Reserved
+        </p>
+
+    </footer>
+
+
+</body>
+</html>
