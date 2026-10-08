@@ -19,8 +19,9 @@ struct Patient
     int arrivalNumber;
     string arrivalTime;
     string status;
+    string doctor;
+    string treatmentTime;
 };
-
 
 struct ComparePriority
 {
@@ -34,7 +35,6 @@ struct ComparePriority
         return p1.arrivalNumber > p2.arrivalNumber;
     }
 };
-
 
 priority_queue<Patient, vector<Patient>, ComparePriority> patientQueue;
 
@@ -63,7 +63,6 @@ string getCurrentDateTime()
     return ss.str();
 }
 
-
 bool patientIDExists(int id)
 {
     for (const Patient& p : allPatients)
@@ -76,7 +75,6 @@ bool patientIDExists(int id)
 
     return false;
 }
-
 
 void saveData()
 {
@@ -97,12 +95,13 @@ void saveData()
              << p.priority << "|"
              << p.arrivalNumber << "|"
              << p.arrivalTime << "|"
-             << p.status << "\n";
+             << p.status << "|"
+             << p.doctor << "|"
+             << p.treatmentTime << "\n";
     }
 
     file.close();
 }
-
 
 void loadData()
 {
@@ -147,7 +146,13 @@ void loadData()
 
             getline(ss, p.arrivalTime, '|');
 
-            getline(ss, p.status);
+            getline(ss, p.status, '|');
+
+            if (!getline(ss, p.doctor, '|'))
+                p.doctor = "Not Assigned";
+
+            if (!getline(ss, p.treatmentTime))
+                p.treatmentTime = "Not Treated";
 
             allPatients.push_back(p);
 
@@ -169,7 +174,6 @@ void loadData()
 
     file.close();
 }
-
 
 void addPatient()
 {
@@ -220,6 +224,31 @@ void addPatient()
         cin >> p.priority;
     }
 
+    cout << "\n";
+    cout << "Available Doctors:\n";
+    cout << "1. Dr. Shah\n";
+    cout << "2. Dr. Patel\n";
+    cout << "3. Dr. Mehta\n";
+
+    int doctorChoice;
+
+    cout << "Select Doctor (1-3): ";
+    cin >> doctorChoice;
+
+    while (doctorChoice < 1 || doctorChoice > 3)
+    {
+        cout << "Invalid choice!\n";
+        cout << "Select Doctor (1-3): ";
+        cin >> doctorChoice;
+    }
+
+    if (doctorChoice == 1)
+        p.doctor = "Dr. Shah";
+    else if (doctorChoice == 2)
+        p.doctor = "Dr. Patel";
+    else
+        p.doctor = "Dr. Mehta";
+
     arrivalCounter++;
 
     p.arrivalNumber = arrivalCounter;
@@ -227,6 +256,7 @@ void addPatient()
     p.arrivalTime = getCurrentDateTime();
 
     p.status = "Waiting";
+    p.treatmentTime = "Not Treated";
 
     allPatients.push_back(p);
 
@@ -239,6 +269,7 @@ void addPatient()
     cout << "Patient ID    : " << p.patientID << endl;
     cout << "Name          : " << p.name << endl;
     cout << "Priority      : " << p.priority << endl;
+    cout << "Doctor        : " << p.doctor << endl;
     cout << "Arrival Time  : " << p.arrivalTime << endl;
     cout << "Status        : " << p.status << endl;
     cout << "=========================================\n";
@@ -266,6 +297,7 @@ void displayWaitingPatients()
          << setw(6) << "Age"
          << setw(20) << "Condition"
          << setw(10) << "Priority"
+         << setw(15) << "Doctor"
          << setw(12) << "Status"
          << endl;
 
@@ -289,7 +321,6 @@ void displayWaitingPatients()
     cout << "===============================================================\n";
 }
 
-
 void viewNextPatient()
 {
     if (patientQueue.empty())
@@ -310,7 +341,9 @@ void viewNextPatient()
     cout << "Age              : " << p.age << endl;
     cout << "Condition        : " << p.condition << endl;
     cout << "Priority         : " << p.priority << endl;
+    cout << "Doctor           : " << p.doctor << endl;
     cout << "Arrival Time     : " << p.arrivalTime << endl;
+    cout << "Treatment Time   : " << p.treatmentTime << endl;
     cout << "Status           : " << p.status << endl;
 
     if (p.priority == 1)
@@ -325,7 +358,6 @@ void viewNextPatient()
     cout << "=========================================\n";
 }
 
-
 void treatNextPatient()
 {
     if (patientQueue.empty())
@@ -333,6 +365,7 @@ void treatNextPatient()
         cout << "\nNo patients are waiting for treatment.\n";
         return;
     }
+
     Patient p = patientQueue.top();
 
     patientQueue.pop();
@@ -347,12 +380,14 @@ void treatNextPatient()
     cout << "Age              : " << p.age << endl;
     cout << "Condition        : " << p.condition << endl;
     cout << "Priority         : " << p.priority << endl;
+    cout << "Doctor           : " << p.doctor << endl;
 
     for (Patient& patient : allPatients)
     {
         if (patient.patientID == p.patientID)
         {
             patient.status = "Treated";
+            patient.treatmentTime = getCurrentDateTime();
             break;
         }
     }
@@ -396,6 +431,8 @@ void searchPatient()
             cout << "Priority         : " << p.priority << endl;
             cout << "Arrival Number   : " << p.arrivalNumber << endl;
             cout << "Arrival Time     : " << p.arrivalTime << endl;
+            cout << "Doctor           : " << p.doctor << endl;
+            cout << "Treatment Time   : " << p.treatmentTime << endl;
             cout << "Status           : " << p.status << endl;
 
             cout << "=========================================\n";
@@ -410,6 +447,7 @@ void searchPatient()
         cout << "\nPatient with ID " << id << " was not found.\n";
     }
 }
+
 void displayAllRecords()
 {
     if (allPatients.empty())
@@ -432,11 +470,14 @@ void displayAllRecords()
         cout << "\nPriority         : " << p.priority;
         cout << "\nArrival Number   : " << p.arrivalNumber;
         cout << "\nArrival Time     : " << p.arrivalTime;
+        cout << "\nDoctor           : " << p.doctor;
+        cout << "\nTreatment Time   : " << p.treatmentTime;
         cout << "\nStatus           : " << p.status;
 
         cout << "\n---------------------------------------------\n";
     }
 }
+
 void displayStatistics()
 {
     int total = allPatients.size();
@@ -468,9 +509,9 @@ void displayStatistics()
 
     cout << "=========================================\n";
 }
+
 int main()
 {
-
     loadData();
 
     int choice;
@@ -540,3 +581,4 @@ int main()
 
     return 0;
 }
+
