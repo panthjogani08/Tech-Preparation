@@ -1,11 +1,14 @@
 #include <iostream>
 #include <queue>
 #include <vector>
-#include <string>
+#include <fstream>
+#include <sstream>
 #include <iomanip>
+#include <string>
+#include <ctime>
+
 using namespace std;
 
-// Structure to store patient details
 struct Patient
 {
     int patientID;
@@ -14,41 +17,178 @@ struct Patient
     string condition;
     int priority;
     int arrivalNumber;
+    string arrivalTime;
+    string status;
 };
 
-// Comparator for Priority Queue
+
 struct ComparePriority
 {
     bool operator()(const Patient& p1, const Patient& p2)
     {
-        // Smaller priority number = higher priority
         if (p1.priority != p2.priority)
         {
             return p1.priority > p2.priority;
         }
 
-        // If priority is same, earlier arrival gets priority
         return p1.arrivalNumber > p2.arrivalNumber;
     }
 };
 
-// Priority Queue
+
 priority_queue<Patient, vector<Patient>, ComparePriority> patientQueue;
 
-// Vector to store all patient records
 vector<Patient> allPatients;
 
 int arrivalCounter = 0;
 
-// Function to add a patient
+const string FILE_NAME = "patients.txt";
+
+string getCurrentDateTime()
+{
+    time_t now = time(0);
+    tm* localTime = localtime(&now);
+
+    stringstream ss;
+
+    ss << setfill('0')
+       << setw(2) << localTime->tm_mday << "-"
+       << setw(2) << localTime->tm_mon + 1 << "-"
+       << localTime->tm_year + 1900 << " ";
+
+    ss << setw(2) << localTime->tm_hour << ":"
+       << setw(2) << localTime->tm_min << ":"
+       << setw(2) << localTime->tm_sec;
+
+    return ss.str();
+}
+
+
+bool patientIDExists(int id)
+{
+    for (const Patient& p : allPatients)
+    {
+        if (p.patientID == id)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+void saveData()
+{
+    ofstream file(FILE_NAME);
+
+    if (!file)
+    {
+        cout << "\nError: Unable to open file!\n";
+        return;
+    }
+
+    for (const Patient& p : allPatients)
+    {
+        file << p.patientID << "|"
+             << p.name << "|"
+             << p.age << "|"
+             << p.condition << "|"
+             << p.priority << "|"
+             << p.arrivalNumber << "|"
+             << p.arrivalTime << "|"
+             << p.status << "\n";
+    }
+
+    file.close();
+}
+
+
+void loadData()
+{
+    ifstream file(FILE_NAME);
+
+    if (!file)
+    {
+        return;
+    }
+
+    string line;
+
+    while (getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        stringstream ss(line);
+        string value;
+
+        Patient p;
+
+        try
+        {
+            getline(ss, value, '|');
+            p.patientID = stoi(value);
+
+            getline(ss, p.name, '|');
+
+            getline(ss, value, '|');
+            p.age = stoi(value);
+
+            getline(ss, p.condition, '|');
+
+            getline(ss, value, '|');
+            p.priority = stoi(value);
+
+            getline(ss, value, '|');
+            p.arrivalNumber = stoi(value);
+
+            getline(ss, p.arrivalTime, '|');
+
+            getline(ss, p.status);
+
+            allPatients.push_back(p);
+
+            if (p.arrivalNumber > arrivalCounter)
+            {
+                arrivalCounter = p.arrivalNumber;
+            }
+
+            if (p.status == "Waiting")
+            {
+                patientQueue.push(p);
+            }
+        }
+        catch (...)
+        {
+            cout << "\nWarning: Invalid record found in file.\n";
+        }
+    }
+
+    file.close();
+}
+
+
 void addPatient()
 {
     Patient p;
 
-    cout << "\n========== ADD PATIENT ==========\n";
+    cout << "\n";
+    cout << "=========================================\n";
+    cout << "           ADD NEW PATIENT\n";
+    cout << "=========================================\n";
 
     cout << "Enter Patient ID: ";
     cin >> p.patientID;
+
+    if (patientIDExists(p.patientID))
+    {
+        cout << "\nPatient ID already exists!\n";
+        cout << "Please use a different ID.\n";
+        return;
+    }
 
     cin.ignore();
 
@@ -63,33 +203,48 @@ void addPatient()
     cout << "Enter Medical Condition: ";
     getline(cin, p.condition);
 
-    cout << "\nSelect Priority:\n";
+    cout << "\n";
+    cout << "Priority Levels:\n";
     cout << "1. Critical Emergency\n";
     cout << "2. Serious Condition\n";
     cout << "3. Moderate Condition\n";
     cout << "4. Normal Condition\n";
 
-    cout << "Enter Priority (1-4): ";
+    cout << "\nEnter Priority (1-4): ";
     cin >> p.priority;
 
-    // Validate priority
     while (p.priority < 1 || p.priority > 4)
     {
-        cout << "Invalid priority! Enter between 1 and 4: ";
+        cout << "Invalid priority!\n";
+        cout << "Enter priority between 1 and 4: ";
         cin >> p.priority;
     }
 
     arrivalCounter++;
+
     p.arrivalNumber = arrivalCounter;
 
-    patientQueue.push(p);
+    p.arrivalTime = getCurrentDateTime();
+
+    p.status = "Waiting";
+
     allPatients.push_back(p);
 
-    cout << "\nPatient added successfully!\n";
+    patientQueue.push(p);
+
+    saveData();
+
+    cout << "\n=========================================\n";
+    cout << "Patient added successfully!\n";
+    cout << "Patient ID    : " << p.patientID << endl;
+    cout << "Name          : " << p.name << endl;
+    cout << "Priority      : " << p.priority << endl;
+    cout << "Arrival Time  : " << p.arrivalTime << endl;
+    cout << "Status        : " << p.status << endl;
+    cout << "=========================================\n";
 }
 
-// Function to display waiting patients
-void displayPatients()
+void displayWaitingPatients()
 {
     if (patientQueue.empty())
     {
@@ -97,17 +252,21 @@ void displayPatients()
         return;
     }
 
-    // Make a temporary queue
-    priority_queue<Patient, vector<Patient>, ComparePriority> temp = patientQueue;
+    priority_queue<Patient, vector<Patient>, ComparePriority> temp =
+        patientQueue;
 
-    cout << "\n================ WAITING PATIENTS ================\n";
+    cout << "\n";
+    cout << "===============================================================\n";
+    cout << "                    WAITING PATIENTS\n";
+    cout << "===============================================================\n";
 
     cout << left
-         << setw(10) << "ID"
-         << setw(20) << "Name"
-         << setw(8) << "Age"
-         << setw(25) << "Condition"
+         << setw(8) << "ID"
+         << setw(18) << "Name"
+         << setw(6) << "Age"
+         << setw(20) << "Condition"
          << setw(10) << "Priority"
+         << setw(12) << "Status"
          << endl;
 
     cout << "---------------------------------------------------------------\n";
@@ -118,16 +277,19 @@ void displayPatients()
         temp.pop();
 
         cout << left
-             << setw(10) << p.patientID
-             << setw(20) << p.name
-             << setw(8) << p.age
-             << setw(25) << p.condition
+             << setw(8) << p.patientID
+             << setw(18) << p.name
+             << setw(6) << p.age
+             << setw(20) << p.condition
              << setw(10) << p.priority
+             << setw(12) << p.status
              << endl;
     }
+
+    cout << "===============================================================\n";
 }
 
-// Function to view next patient
+
 void viewNextPatient()
 {
     if (patientQueue.empty())
@@ -138,13 +300,18 @@ void viewNextPatient()
 
     Patient p = patientQueue.top();
 
-    cout << "\n========== NEXT PATIENT ==========\n";
+    cout << "\n";
+    cout << "=========================================\n";
+    cout << "             NEXT PATIENT\n";
+    cout << "=========================================\n";
 
     cout << "Patient ID       : " << p.patientID << endl;
     cout << "Name             : " << p.name << endl;
     cout << "Age              : " << p.age << endl;
     cout << "Condition        : " << p.condition << endl;
     cout << "Priority         : " << p.priority << endl;
+    cout << "Arrival Time     : " << p.arrivalTime << endl;
+    cout << "Status           : " << p.status << endl;
 
     if (p.priority == 1)
         cout << "Priority Type    : Critical Emergency\n";
@@ -154,9 +321,11 @@ void viewNextPatient()
         cout << "Priority Type    : Moderate Condition\n";
     else
         cout << "Priority Type    : Normal Condition\n";
+
+    cout << "=========================================\n";
 }
 
-// Function to treat next patient
+
 void treatNextPatient()
 {
     if (patientQueue.empty())
@@ -164,11 +333,14 @@ void treatNextPatient()
         cout << "\nNo patients are waiting for treatment.\n";
         return;
     }
-
     Patient p = patientQueue.top();
+
     patientQueue.pop();
 
-    cout << "\n========== PATIENT BEING TREATED ==========\n";
+    cout << "\n";
+    cout << "=========================================\n";
+    cout << "          PATIENT BEING TREATED\n";
+    cout << "=========================================\n";
 
     cout << "Patient ID       : " << p.patientID << endl;
     cout << "Name             : " << p.name << endl;
@@ -176,10 +348,23 @@ void treatNextPatient()
     cout << "Condition        : " << p.condition << endl;
     cout << "Priority         : " << p.priority << endl;
 
+    for (Patient& patient : allPatients)
+    {
+        if (patient.patientID == p.patientID)
+        {
+            patient.status = "Treated";
+            break;
+        }
+    }
+
+    saveData();
+
     cout << "\nPatient treatment completed successfully!\n";
+    cout << "Patient status updated to: Treated\n";
+
+    cout << "=========================================\n";
 }
 
-// Function to search patient
 void searchPatient()
 {
     if (allPatients.empty())
@@ -195,19 +380,25 @@ void searchPatient()
 
     bool found = false;
 
-    for (int i = 0; i < allPatients.size(); i++)
+    for (const Patient& p : allPatients)
     {
-        if (allPatients[i].patientID == id)
+        if (p.patientID == id)
         {
-            Patient p = allPatients[i];
-
-            cout << "\n========== PATIENT FOUND ==========\n";
+            cout << "\n";
+            cout << "=========================================\n";
+            cout << "             PATIENT FOUND\n";
+            cout << "=========================================\n";
 
             cout << "Patient ID       : " << p.patientID << endl;
             cout << "Name             : " << p.name << endl;
             cout << "Age              : " << p.age << endl;
             cout << "Condition        : " << p.condition << endl;
             cout << "Priority         : " << p.priority << endl;
+            cout << "Arrival Number   : " << p.arrivalNumber << endl;
+            cout << "Arrival Time     : " << p.arrivalTime << endl;
+            cout << "Status           : " << p.status << endl;
+
+            cout << "=========================================\n";
 
             found = true;
             break;
@@ -216,11 +407,9 @@ void searchPatient()
 
     if (!found)
     {
-        cout << "\nPatient not found.\n";
+        cout << "\nPatient with ID " << id << " was not found.\n";
     }
 }
-
-// Function to display all registered records
 void displayAllRecords()
 {
     if (allPatients.empty())
@@ -229,43 +418,69 @@ void displayAllRecords()
         return;
     }
 
-    cout << "\n================ ALL PATIENT RECORDS ================\n";
+    cout << "\n";
+    cout << "====================================================================\n";
+    cout << "                    ALL PATIENT RECORDS\n";
+    cout << "====================================================================\n";
 
-    cout << left
-         << setw(10) << "ID"
-         << setw(20) << "Name"
-         << setw(8) << "Age"
-         << setw(25) << "Condition"
-         << setw(10) << "Priority"
-         << endl;
-
-    cout << "---------------------------------------------------------------\n";
-
-    for (int i = 0; i < allPatients.size(); i++)
+    for (const Patient& p : allPatients)
     {
-        Patient p = allPatients[i];
+        cout << "\nPatient ID       : " << p.patientID;
+        cout << "\nName             : " << p.name;
+        cout << "\nAge              : " << p.age;
+        cout << "\nCondition        : " << p.condition;
+        cout << "\nPriority         : " << p.priority;
+        cout << "\nArrival Number   : " << p.arrivalNumber;
+        cout << "\nArrival Time     : " << p.arrivalTime;
+        cout << "\nStatus           : " << p.status;
 
-        cout << left
-             << setw(10) << p.patientID
-             << setw(20) << p.name
-             << setw(8) << p.age
-             << setw(25) << p.condition
-             << setw(10) << p.priority
-             << endl;
+        cout << "\n---------------------------------------------\n";
     }
 }
+void displayStatistics()
+{
+    int total = allPatients.size();
+    int waiting = 0;
+    int treated = 0;
+    int critical = 0;
 
-// Main function
+    for (const Patient& p : allPatients)
+    {
+        if (p.status == "Waiting")
+            waiting++;
+
+        if (p.status == "Treated")
+            treated++;
+
+        if (p.priority == 1 && p.status == "Waiting")
+            critical++;
+    }
+
+    cout << "\n";
+    cout << "=========================================\n";
+    cout << "             HOSPITAL STATISTICS\n";
+    cout << "=========================================\n";
+
+    cout << "Total Patients       : " << total << endl;
+    cout << "Waiting Patients     : " << waiting << endl;
+    cout << "Treated Patients     : " << treated << endl;
+    cout << "Critical Patients    : " << critical << endl;
+
+    cout << "=========================================\n";
+}
 int main()
 {
+
+    loadData();
+
     int choice;
 
     do
     {
         cout << "\n\n";
-        cout << "===============================================\n";
-        cout << "       HOSPITAL PATIENT QUEUE SYSTEM\n";
-        cout << "===============================================\n";
+        cout << "================================================\n";
+        cout << "        HOSPITAL PATIENT QUEUE SYSTEM\n";
+        cout << "================================================\n";
 
         cout << "1. Add Patient\n";
         cout << "2. Display Waiting Patients\n";
@@ -273,9 +488,11 @@ int main()
         cout << "4. Treat Next Patient\n";
         cout << "5. Search Patient\n";
         cout << "6. Display All Patient Records\n";
-        cout << "7. Exit\n";
+        cout << "7. Display Hospital Statistics\n";
+        cout << "8. Exit\n";
 
-        cout << "===============================================\n";
+        cout << "================================================\n";
+
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -286,7 +503,7 @@ int main()
                 break;
 
             case 2:
-                displayPatients();
+                displayWaitingPatients();
                 break;
 
             case 3:
@@ -306,15 +523,20 @@ int main()
                 break;
 
             case 7:
-                cout << "\nThank you for using Hospital Patient Queue System!\n";
+                displayStatistics();
+                break;
+
+            case 8:
+                cout << "\n";
+                cout << "Thank you for using Hospital Patient Queue System!\n";
+                cout << "All patient records are safely stored.\n";
                 break;
 
             default:
-                cout << "\nInvalid choice! Please try again.\n";
+                cout << "\nInvalid choice! Please enter 1-8.\n";
         }
 
-        
-    } while (choice != 7);
+    } while (choice != 8);
 
     return 0;
 }
