@@ -222,6 +222,93 @@
             margin: 15px;
         }
 
+        .about-section {
+            padding: 60px 8%;
+            text-align: center;
+            background: white;
+        }
+
+        .about-section p {
+            max-width: 750px;
+            margin: 20px auto 0;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 60px 8%;
+            background: #f8f9fc;
+        }
+
+        .contact-info {
+            max-width: 600px;
+            margin: 25px auto;
+            text-align: center;
+            line-height: 2;
+        }
+
+        .contact-info a {
+            color: #6246c7;
+            text-decoration: none;
+        }
+
+        .contact-form {
+            max-width: 550px;
+            margin: 25px auto 0;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 18px #00000015;
+        }
+
+        .contact-form label {
+            display: block;
+            margin: 15px 0 7px;
+            font-weight: bold;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        .contact-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .contact-form button {
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 25px;
+            text-align: center;
+            color: white;
+            background: #292342;
+        }
+
+        @media (max-width: 600px) {
+            .about-section,
+            .contact-section {
+                padding: 40px 5%;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+        }
+
     </style>
 </head>
 
@@ -330,6 +417,54 @@
         <p id="bookingMessage" role="status"></p>
     </section>
 
+    <section class="about-section" id="about">
+        <h2 class="section-title">About BookYOURS</h2>
+
+        <p>
+            BookYOURS helps travellers explore hotel options for their
+            next trip. Discover stays in beautiful destinations, compare
+            sample prices, and fill in our demo booking form to plan your stay.
+            We aim to make your hotel search simple and convenient.
+        </p>
+    </section>
+
+    <section class="contact-section" id="contact">
+        <h2 class="section-title">Contact Us</h2>
+
+        <div class="contact-info">
+            <p>Have a question about our demo website?</p>
+            <p>Location: Anand, Gujarat, India</p>
+            <p>Email: <a href="mailto:hello@bookyours.example">
+                hello@bookyours.example
+            </a></p>
+        </div>
+
+        <form class="contact-form" id="contactForm">
+            <label for="contactName">Your Name</label>
+            <input type="text" id="contactName"
+                   placeholder="Enter your name" required>
+
+            <label for="contactEmail">Your Email</label>
+            <input type="email" id="contactEmail"
+                   placeholder="Enter your email" required>
+
+            <label for="contactMessage">Your Message</label>
+            <textarea id="contactMessage"
+                      placeholder="Write your message" required></textarea>
+
+            <button type="submit" class="hotel-book-btn">
+                Send Message
+            </button>
+
+            <p id="contactStatus" role="status"></p>
+        </form>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 BookYOURS. Created for a hotel booking project.</p>
+    </footer>
+
+
     <script>
         document.getElementById("bookingForm").addEventListener("submit", function(event) {
             event.preventDefault();
@@ -348,6 +483,16 @@
 
             this.reset();
         });
+
+        document.getElementById("contactForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            document.getElementById("contactStatus").textContent =
+                "Thank you! This demo form does not send messages yet.";
+
+            this.reset();
+        });
+
     </script>
 
 </body>
