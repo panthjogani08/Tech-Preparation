@@ -278,3 +278,74 @@ void treatNextPatient()
     cout << "Name: " << p.name << endl;
     cout << "Status updated to Treated.\n";
 }
+
+void searchPatient()
+{
+    int id;
+
+    cout << "Enter Patient ID to search: ";
+    cin >> id;
+
+    for (const Patient& p : allPatients)
+    {
+        if (p.patientID == id)
+        {
+            cout << "\nPatient Found\n";
+            cout << "ID: " << p.patientID << endl;
+            cout << "Name: " << p.name << endl;
+            cout << "Age: " << p.age << endl;
+            cout << "Condition: " << p.condition << endl;
+            cout << "Priority: " << p.priority << endl;
+            cout << "Status: " << p.status << endl;
+            return;
+        }
+    }
+
+    cout << "Patient not found.\n";
+}
+
+void displayAllRecords()
+{
+    if (allPatients.empty())
+    {
+        cout << "No patient records available.\n";
+        return;
+    }
+
+    for (const Patient& p : allPatients)
+    {
+        cout << "\nPatient ID: " << p.patientID << endl;
+        cout << "Name: " << p.name << endl;
+        cout << "Age: " << p.age << endl;
+        cout << "Condition: " << p.condition << endl;
+        cout << "Priority: " << p.priority << endl;
+        cout << "Arrival Time: " << p.arrivalTime << endl;
+        cout << "Status: " << p.status << endl;
+    }
+}
+
+void displayStatistics()
+{
+    int total = allPatients.size();
+    int waiting = 0;
+    int treated = 0;
+    int critical = 0;
+
+    for (const Patient& p : allPatients)
+    {
+        if (p.status == "Waiting")
+            waiting++;
+
+        if (p.status == "Treated")
+            treated++;
+
+        if (p.priority == 1 && p.status == "Waiting")
+            critical++;
+    }
+
+    cout << "\nHospital Statistics\n";
+    cout << "Total Patients: " << total << endl;
+    cout << "Waiting Patients: " << waiting << endl;
+    cout << "Treated Patients: " << treated << endl;
+    cout << "Critical Patients: " << critical << endl;
+}
