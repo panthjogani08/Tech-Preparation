@@ -349,3 +349,69 @@ void displayStatistics()
     cout << "Treated Patients: " << treated << endl;
     cout << "Critical Patients: " << critical << endl;
 }
+
+int main()
+{
+    loadData();
+
+    int choice;
+
+    do
+    {
+        cout << "\n====================================\n";
+        cout << "  HOSPITAL PATIENT QUEUE SYSTEM\n";
+        cout << "====================================\n";
+        cout << "1. Add Patient\n";
+        cout << "2. Display Waiting Patients\n";
+        cout << "3. View Next Patient\n";
+        cout << "4. Treat Next Patient\n";
+        cout << "5. Search Patient\n";
+        cout << "6. Display All Patient Records\n";
+        cout << "7. Display Hospital Statistics\n";
+        cout << "8. Exit\n";
+        cout << "Enter your choice: ";
+
+        cin >> choice;
+
+        switch (choice)
+        {
+            case 1:
+                addPatient();
+                break;
+
+            case 2:
+                displayWaitingPatients();
+                break;
+
+            case 3:
+                viewNextPatient();
+                break;
+
+            case 4:
+                treatNextPatient();
+                break;
+
+            case 5:
+                searchPatient();
+                break;
+
+            case 6:
+                displayAllRecords();
+                break;
+
+            case 7:
+                displayStatistics();
+                break;
+
+            case 8:
+                cout << "Thank you for using the system!\n";
+                break;
+
+            default:
+                cout << "Invalid choice! Enter 1-8.\n";
+        }
+
+    } while (choice != 8);
+
+    return 0;
+}
