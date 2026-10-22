@@ -205,3 +205,76 @@ void addPatient()
     cout << "Arrival Time: " << p.arrivalTime << endl;
     cout << "Status: " << p.status << endl;
 }
+
+void displayWaitingPatients()
+{
+    if (patientQueue.empty())
+    {
+        cout << "No patients are currently waiting.\n";
+        return;
+    }
+
+    auto temp = patientQueue;
+
+    cout << "\nID\tName\t\tAge\tPriority\tStatus\n";
+
+    while (!temp.empty())
+    {
+        Patient p = temp.top();
+        temp.pop();
+
+        cout << p.patientID << "\t"
+             << p.name << "\t\t"
+             << p.age << "\t"
+             << p.priority << "\t\t"
+             << p.status << endl;
+    }
+}
+
+void viewNextPatient()
+{
+    if (patientQueue.empty())
+    {
+        cout << "No patients are waiting.\n";
+        return;
+    }
+
+    Patient p = patientQueue.top();
+
+    cout << "\nNext Patient\n";
+    cout << "Patient ID: " << p.patientID << endl;
+    cout << "Name: " << p.name << endl;
+    cout << "Age: " << p.age << endl;
+    cout << "Condition: " << p.condition << endl;
+    cout << "Priority: " << p.priority << endl;
+    cout << "Arrival Time: " << p.arrivalTime << endl;
+    cout << "Status: " << p.status << endl;
+}
+
+void treatNextPatient()
+{
+    if (patientQueue.empty())
+    {
+        cout << "No patients are waiting for treatment.\n";
+        return;
+    }
+
+    Patient p = patientQueue.top();
+    patientQueue.pop();
+
+    for (Patient& patient : allPatients)
+    {
+        if (patient.patientID == p.patientID)
+        {
+            patient.status = "Treated";
+            break;
+        }
+    }
+
+    saveData();
+
+    cout << "\nPatient treatment completed!\n";
+    cout << "Patient ID: " << p.patientID << endl;
+    cout << "Name: " << p.name << endl;
+    cout << "Status updated to Treated.\n";
+}
