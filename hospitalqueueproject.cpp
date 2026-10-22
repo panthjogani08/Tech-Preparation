@@ -148,3 +148,60 @@ void loadData()
     file.close();
 }
 
+void addPatient()
+{
+    Patient p;
+
+    cout << "\nEnter Patient ID: ";
+    cin >> p.patientID;
+
+    if (patientIDExists(p.patientID))
+    {
+        cout << "Patient ID already exists!\n";
+        return;
+    }
+
+    cin.ignore();
+
+    cout << "Enter Patient Name: ";
+    getline(cin, p.name);
+
+    cout << "Enter Age: ";
+    cin >> p.age;
+    cin.ignore();
+
+    cout << "Enter Medical Condition: ";
+    getline(cin, p.condition);
+
+    cout << "\nPriority Levels:\n";
+    cout << "1. Critical Emergency\n";
+    cout << "2. Serious Condition\n";
+    cout << "3. Moderate Condition\n";
+    cout << "4. Normal Condition\n";
+
+    cout << "Enter Priority (1-4): ";
+    cin >> p.priority;
+
+    while (p.priority < 1 || p.priority > 4)
+    {
+        cout << "Enter priority between 1 and 4: ";
+        cin >> p.priority;
+    }
+
+    arrivalCounter++;
+    p.arrivalNumber = arrivalCounter;
+    p.arrivalTime = getCurrentDateTime();
+    p.status = "Waiting";
+
+    allPatients.push_back(p);
+    patientQueue.push(p);
+
+    saveData();
+
+    cout << "\nPatient added successfully!\n";
+    cout << "Patient ID: " << p.patientID << endl;
+    cout << "Name: " << p.name << endl;
+    cout << "Priority: " << p.priority << endl;
+    cout << "Arrival Time: " << p.arrivalTime << endl;
+    cout << "Status: " << p.status << endl;
+}
